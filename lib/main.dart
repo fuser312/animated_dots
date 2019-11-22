@@ -4,38 +4,55 @@ import 'package:flutter/material.dart';
 void main () => runApp(MaterialApp(debugShowCheckedModeBanner: false, home: AnimatedDots()));
 
 class AnimatedDots extends StatefulWidget {
-  final offsetBool;
-  final double widthSlide;
-  AnimatedDots({
-    Key key,
-    this.offsetBool,
-    this.widthSlide
-}): super(key:key);
+ 
+  AnimatedDots({Key key,}): super(key:key);
   @override
   _AnimatedDotsState createState() => _AnimatedDotsState();
 }
 
+class JumpingBalls extends Curve {
+
+  double begin;
+  double end;
+  JumpingBalls(this.begin, this.end);
+
+  @override
+
+  double transformInternal(double t) {
+    if(t >= begin && t<(begin+end)/2.0){
+      return (2*(t - begin) / (begin-end)) ;
+
+    }
+    else if(t >= (begin+end)/2.0+0.2 && t<end){
+      return (2*(end - t) / (end - begin)) ;
+
+    }
+    else return 0;
+  }
+}
+
+
 class _AnimatedDotsState extends State<AnimatedDots> with SingleTickerProviderStateMixin{
-  AnimationController _controller;
-  Animation<Offset> _offsetFloat;
+  AnimationController animationController;
+  Animation animation;
 
   @override
   void initState() {
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+
+    animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(animationController);
+
+
+    animationController.repeat(
+    );
+
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _offsetFloat = Tween<Offset>(begin: Offset(widget.widthSlide, 0.0), end: Offset.zero).animate(_controller);
-    _offsetFloat.addListener((){
-      setState(() {
-
-      });
-    });
-    _controller.forward();
-  }
-
-  @override
-  void dispose(){
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -48,39 +65,55 @@ class _AnimatedDotsState extends State<AnimatedDots> with SingleTickerProviderSt
             height: 200,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey,
+              color: Colors.black,
               borderRadius: BorderRadius.circular(80.0),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                  SlideTransition(
-                       position: _offsetFloat,
+                       position:Tween<Offset>(begin: Offset(0.0, 0.0), end: Offset(0.0, -0.4)).animate(CurvedAnimation(
+                      parent: animationController,
+                      curve:JumpingBalls(0.0,0.4),
+                )),
                        child: Container(
-                        height : 20,
+                        height : 40,
                         width: 20,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.blue,
+                          color: Colors.grey,
                         ),
                     ),
                      ),
 
 
-                Container(
-                  height : 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue,
+                SlideTransition(
+                  position:Tween<Offset>(begin:Offset(0.0, 0.0), end: Offset(0.0, -0.4)) .animate(CurvedAnimation(
+                  parent: animationController,
+                  curve:JumpingBalls(0.2,0.6),
+                )),
+                   child: Container(
+                    height : 40,
+                    width: 20,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
+                    ),
                   ),
                 ),
-                Container(
-                  height : 20,
-                  width: 20,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.blue,
+
+                SlideTransition(
+                  position:Tween<Offset>(begin: Offset(0.0, 0.0), end: Offset(0.0, -0.4)).animate(CurvedAnimation(
+                  parent: animationController,
+                  curve:JumpingBalls(0.4,0.8),
+                  )),
+                  child: Container(
+                    height : 40,
+                    width: 20,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey,
+                    ),
                   ),
                 )
               ],
